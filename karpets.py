@@ -6,7 +6,7 @@ Created on Sun Nov 27 14:31:42 2016
 """
 
 import pandas as pd
-import re
+import re               #библиотека для работы с регулярными выражениями
 #import numpy as np
 
 
