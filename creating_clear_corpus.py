@@ -1,13 +1,16 @@
-from nltk.corpus import stopwords 
-import nltk
-from nltk.util import ngrams 
-import csv 
-import string 
 import os
-
 import pandas as pd
 import re
-#import numpy as np
+from nltk.corpus import stopwords 
+from nltk.util import ngrams 
+from nltk.stem.api import StemmerI
+from nltk.stem.regexp import RegexpStemmer
+from nltk.stem.lancaster import LancasterStemmer
+from nltk.stem.isri import ISRIStemmer
+from nltk.stem.porter import PorterStemmer
+from nltk.stem.snowball import SnowballStemmer
+from nltk.stem.wordnet import WordNetLemmatizer
+from nltk.stem.rslp import RSLPStemmer
 
 
 def filter_pattern(arr_pattern, text):
@@ -267,6 +270,28 @@ print('Number of all descriptions: ')
 print(len(list_of_all_projects_cleaned_bugs_descriptions_with_stack_trace_flags))
 #print(list_of_all_projects_cleaned_bugs_descriptions_with_stack_trace_flags)
 
+#stem function
+def stem(tokens, stop_words):
+    #different stemm algorithms
+    stemming_algorithms = {
+    "stemmer1" : SnowballStemmer("english"),
+    "stemmer2" : StemmerI,
+    "stemmer3" : RegexpStemmer,
+    "stemmer4" : LancasterStemmer,
+    "stemmer5" : ISRIStemmer,
+    "stemmer6" : PorterStemmer,
+    "stemmer7" : SnowballStemmer,
+    "stemmer8" : WordNetLemmatizer,
+    "stemmer9" : RSLPStemmer}
+    tokens = [stemming_algorithms['stemmer1'].stem(token) for token in tokens if (token not in stop_words)] 
+    return tokens 
+    
+#lemmatize function   
+def lem(tokens, stop_words):
+    lmtzr = WordNetLemmatizer()
+    tokens = [lmtzr.lemmatize(token) for token in tokens if (token not in stop_words)] 
+    return tokens
+
 #return tokens without stop words
 def get_tokens(file_text):
     #cleaning words, making lowercase and tokenization
@@ -286,8 +311,12 @@ def get_tokens(file_text):
         stop_words = variants_of_stopwords['319']
     except KeyError as e:
         raise ValueError('Undefined unit: {}'.format(e.args[1]))
-    tokens = [i for i in tokens if ( i not in stop_words )] 
-    
+    #call stem or lem function
+    stem_or_lem = {
+    "stem" : lem(tokens, stop_words),
+    "lem" : stem(tokens, stop_words)                
+    }
+    tokens = stem_or_lem["lem"]
     return tokens 
 
 #return bigrams
